@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>حاسبة السعرات والماكروز - Macros Calculator</title>
+</head>
+<body>
+
+<div class="container">
+    <h2>حاسبة السعرات والماكروز</h2>
+    
+    <div class="form-group">
+        <label for="age">السن (بالسنين):</label>
+        <input type="number" id="age" placeholder="مثال: 20">
+    </div>
+
+    <div class="form-group">
+        <label for="gender">النوع:</label>
+        <select id="gender">
+            <option value="male">ذكر</option>
+            <option value="female">أنثى</option>
+        </select>
+    </div>
+
+    <div class="form-group">
+        <label for="weight">الوزن (كجم):</label>
+        <input type="number" id="weight" placeholder="مثال: 70">
+    </div>
+
+    <div class="form-group">
+        <label for="height">الطول (سم):</label>
+        <input type="number" id="height" placeholder="مثال: 175">
+    </div>
+
+    <div class="form-group">
+        <label for="activity">مستوى النشاط:</label>
+        <select id="activity">
+            <option value="1.2">قليل الحركة (تمرين خفيف أو بدون)</option>
+            <option value="1.375">نشاط خفيف (تمرين 1-3 أيام أسبوعياً)</option>
+            <option value="1.55">نشاط متوسط (تمرين 3-5 أيام أسبوعياً)</option>
+            <option value="1.725">نشاط عالي (تمرين 6-7 أيام أسبوعياً)</option>
+        </select>
+    </div>
+
+    <div class="form-group">
+        <label for="goal">الهدف:</label>
+        <select id="goal">
+            <option value="maintain">ثبات الوزن</option>
+            <option value="bulk">زيادة الوزن (تضخم)</option>
+            <option value="cut">خسارة الوزن (تنشيف)</option>
+        </select>
+    </div>
+
+    <button onclick="calculateMacros()">احسب السعرات والماكروز</button>
+
+    <div class="results" id="resultsBox">
+        <h3>النتائج الخاصة بك:</h3>
+        <p id="caloriesResult"></p>
+        <p id="proteinResult"></p>
+        <p id="carbsResult"></p>
+        <p id="fatsResult"></p>
+    </div>
+</div>
+
+<style>
+    * {
+        box-sizing: border-box;
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+    }
+    body {
+        background-color: #f4f7f6;
+        color: #333;
+        padding: 20px;
+    }
+    .container {
+        max-width: 600px;
+        margin: 0 auto;
+        background: #fff;
+        padding: 30px;
+        border-radius: 12px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    }
+    h2 {
+        text-align: center;
+        color: #2c3e50;
+        margin-bottom: 25px;
+    }
+    .form-group {
+        margin-bottom: 15px;
+    }
+    label {
+        display: block;
+        margin-bottom: 5px;
+        font-weight: bold;
+        color: #555;
+    }
+    input, select {
+        width: 100%;
+        padding: 10px;
+        border: 1px solid #ddd;
+        border-radius: 6px;
+        font-size: 16px;
+    }
+    button {
+        width: 100%;
+        padding: 12px;
+        background-color: #27ae60;
+        color: white;
+        border: none;
+        border-radius: 6px;
+        font-size: 18px;
+        cursor: pointer;
+        margin-top: 20px;
+        transition: background 0.3s;
+    }
+    button:hover {
+        background-color: #219653;
+    }
+    .results {
+        margin-top: 30px;
+        padding: 20px;
+        background: #e8f8f5;
+        border-radius: 8px;
+        border-right: 5px solid #27ae60;
+        display: none;
+    }
+    .results h3 {
+        margin-bottom: 10px;
+        color: #27ae60;
+    }
+    .results p {
+        font-size: 16px;
+        margin: 8px 0;
+    }
+</style>
+
+<script>
+    function calculateMacros() {
+        let age = Number(document.getElementById('age').value);
+        let gender = document.getElementById('gender').value;
+        let weight = Number(document.getElementById('weight').value);
+        let height = Number(document.getElementById('height').value);
+        let activity = Number(document.getElementById('activity').value);
+        let goal = document.getElementById('goal').value;
+
+        if(!age || !weight || !height) {
+            alert("من فضلك ادخل جميع البيانات بشكل صحيح!");
+            return;
+        }
+
+        let bmr;
+        if (gender === 'male') {
+            bmr = (10 * weight) + (6.25 * height) - (5 * age) + 5;
+        } else {
+            bmr = (10 * weight) + (6.25 * height) - (5 * age) - 161;
+        }
+
+        let tdee = bmr * activity;
+
+        let targetCalories = tdee;
+        if (goal === 'bulk') {
+            targetCalories += 300; 
+        } else if (goal === 'cut') {
+            targetCalories -= 400; 
+        }
+
+        let proteinGrams = Math.round(weight * 2); 
+        let proteinCalories = proteinGrams * 4;
+
+        let fatCalories = targetCalories * 0.25;
+        let fatGrams = Math.round(fatCalories / 9);
+
+        let remainingCalories = targetCalories - (proteinCalories + fatCalories);
+        let carbGrams = Math.round(remainingCalories / 4);
+        let carbCalories = carbGrams * 4;
+
+        document.getElementById('resultsBox').style.display = 'block';
+        document.getElementById('caloriesResult').innerHTML = `<strong>السعرات المستهدفة:</strong> ${Math.round(targetCalories)} سعرة حرارية`;
+        document.getElementById('proteinResult').innerHTML = `<strong>البروتين:</strong> ${proteinGrams} جرام (${Math.round(proteinCalories)} سعرة)`;
+        document.getElementById('carbsResult').innerHTML = `<strong>الكربوهيدرات:</strong> ${carbGrams} جرام (${Math.round(carbCalories)} سعرة)`;
+        document.getElementById('fatsResult').innerHTML = `<strong>الدهون:</strong> ${fatGrams} جرام (${Math.round(fatCalories)} سعرة)`;
+    }
+</script>
+
+</body>
+</html>
